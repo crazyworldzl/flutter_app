@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'Calculator.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(CalculatorApp());
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -25,13 +26,27 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MWidget extends StatelessWidget {
+class MWidget extends StatefulWidget {
   String title;
 
   MWidget(this.title);
 
   @override
+  State<StatefulWidget> createState() {
+    // TODO: implement createState
+    return _MHome(title);
+  }
+}
+
+class _MHome extends State<MWidget> {
+  String title;
+
+  _MHome(this.title);
+
+  @override
   Widget build(BuildContext context) {
+    // TODO: implement build
+
     return Column(
       children: <Widget>[
         titleMethod(context),
@@ -61,7 +76,7 @@ class MWidget extends StatelessWidget {
   resultMethod(context) {
     return resultWidget = new Container(
       child: Text(
-        'hh',
+        resultString,
         style: TextStyle(decoration: TextDecoration.none),
       ),
       color: Color.fromARGB(255, 255, 255, 255),
@@ -78,53 +93,104 @@ class MWidget extends StatelessWidget {
       color: Color(0xffffffff),
       child: Column(
         children: <Widget>[
-          RowText(<String>['7', '8', '9', '*']),
-          RowText(<String>['4', '5', '6', '-']),
-          RowText(<String>['1', '2', '3', '+']),
-          RowText(<String>['.', '/', ' ', '=']),
+          RowText(<String>['7', '8', '9', '*'], _changeKey),
+          RowText(<String>['4', '5', '6', '-'], _changeKey),
+          RowText(<String>['1', '2', '3', '+'], _changeKey),
+          RowText(<String>['.', '/', 'CE', '='], _changeKey),
         ],
         mainAxisAlignment: MainAxisAlignment.spaceAround,
       ),
     );
   }
+
+  static List<String> dd;
+  static String lastSymbol='';
+  static int lastResult=0;
+  String resultString = "";
+  bool isReset=false;
+  _changeKey(String data) {
+    setState(() {
+      if(isReset){
+        try {
+          num.parse(data);
+          resultString = '$data\n';
+          lastSymbol ='';
+        }on Exception{
+          resultString ='';
+          lastSymbol = '';
+        }
+        lastResult = 0;
+        isReset = false;
+      }else if(data=='CE'){
+        resultString='';
+        lastSymbol='';
+        lastResult=0;
+        isReset=false;
+      }else if(data=='='){
+        isReset=true;
+
+      }else if ( data == '+' || data == '-' || data == '*' || data == '/') {
+        if(lastSymbol==''){
+          resultString = resultString.split('\n').toList()[0]+data+'\n';
+        }else {
+          dd = (resultWidget.child as Text).data.split('\n').toList();
+          lastResult = num.parse(dd[1]);
+          resultString = '${dd[0] + data}\n$lastResult';
+        }
+        lastSymbol = data;
+      } else {
+        if(lastSymbol=='') {
+          resultString='$data\n';
+          lastResult=num.parse(data);
+        }else{
+          if (lastSymbol == '+') {
+            lastResult = lastResult + num.parse(data);
+          } else if (lastSymbol == '-') {
+            lastResult = lastResult - num.parse(data);
+          } else if (lastSymbol == '*') {
+            lastResult = lastResult * num.parse(data);
+          } else if (lastSymbol == '/') {
+            lastResult = (lastResult / num.parse(data)).toInt();
+          } else {
+            resultString = '';
+          }
+          dd = resultString.split('\n').toList();
+          resultString = '${dd[0] + data}\n$lastResult';
+        }
+
+      }
+    });
+  }
 }
 
 class NumberText extends GestureDetector {
-  NumberText(String data)
+  NumberText(String data, Function f)
       : super(
             child: Text(
               data,
               textAlign: TextAlign.left,
               style: TextStyle(
-              decoration: TextDecoration.none,
-              color: Color(0xff007766),
-              ),),
-            onTap:()=>{
-              showDialog<Null>(context:null,
-                builder: (context){
-                return AlertDialog(title:Text(data),);
-                }
-
-              )
-            },
-
-  );
+                decoration: TextDecoration.none,
+                color: Color(0xff007766),
+              ),
+            ),
+            onTap: ()=>{f(data)});
 }
 
 class RowText extends Row {
   List<Widget> childWegit = new List<Widget>();
 
-  RowText(List<String> numbers)
+  RowText(List<String> numbers, Function f)
       : super(
-          children: getWegit(numbers),
+          children: getWegit(numbers, f),
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           mainAxisSize: MainAxisSize.max,
         );
 
-  static List<Widget> getWegit(List<String> numbers) {
+  static List<Widget> getWegit(List<String> numbers, Function f) {
     List<Widget> childWegits = new List<Widget>();
     for (var item in numbers) {
-      childWegits.add(NumberText(item));
+      childWegits.add(NumberText(item, f));
     }
     return childWegits;
   }
