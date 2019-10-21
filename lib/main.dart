@@ -1,5 +1,3 @@
-import 'dart:ui' as prefix0;
-
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
@@ -31,6 +29,7 @@ class MWidget extends StatelessWidget {
   String title;
 
   MWidget(this.title);
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -90,26 +89,38 @@ class MWidget extends StatelessWidget {
   }
 }
 
-class NumberText extends Text {
-  NumberText(String data) : super(
-    data, 
-    textAlign: TextAlign.left,
-    style:TextStyle(
-        decoration: TextDecoration.none,
-        color: Color(0xff007766),
-    ),
-    
-     );
+class NumberText extends GestureDetector {
+  NumberText(String data)
+      : super(
+            child: Text(
+              data,
+              textAlign: TextAlign.left,
+              style: TextStyle(
+              decoration: TextDecoration.none,
+              color: Color(0xff007766),
+              ),),
+            onTap:()=>{
+              showDialog<Null>(context:null,
+                builder: (context){
+                return AlertDialog(title:Text(data),);
+                }
+
+              )
+            },
+
+  );
 }
 
 class RowText extends Row {
   List<Widget> childWegit = new List<Widget>();
+
   RowText(List<String> numbers)
       : super(
           children: getWegit(numbers),
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           mainAxisSize: MainAxisSize.max,
         );
+
   static List<Widget> getWegit(List<String> numbers) {
     List<Widget> childWegits = new List<Widget>();
     for (var item in numbers) {
