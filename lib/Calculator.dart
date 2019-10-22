@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
+import 'Home.dart';
+import 'main.dart';
+
 class CalculatorApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -51,13 +54,33 @@ class _MHome extends State<MWidget> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-
     return Column(
       children: <Widget>[
         titleMethod(context),
         calculatorMethod(),
         resultMethod(context),
         keyboardMethod(context),
+        GestureDetector(
+          child: Container(child: Text('go to Home'),
+            height: 30,
+            color: Color(0xff888888),
+          ),
+          onTap: ()=>{
+
+
+
+
+          Navigator.push(context, MaterialPageRoute(builder: (_) {
+          return Home();
+          }))
+
+
+
+
+
+
+        },
+        ),
       ],
     );
   }
@@ -108,7 +131,7 @@ class _MHome extends State<MWidget> {
   keyboardMethod(context) {
     return Container(
       margin: EdgeInsets.fromLTRB(0, 1, 0, 1),
-      height: MediaQuery.of(context).size.height - 100 - 100 - 23 - 20 - 2,
+      height: MediaQuery.of(context).size.height - 100 - 100 - 23 - 20-30 - 2,
       color: Color(0xffffffff),
       child: Column(
         children: <Widget>[
