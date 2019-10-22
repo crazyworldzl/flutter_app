@@ -20,7 +20,7 @@ class CalculatorApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MWidget('Hello EveryBody!'),
+      home: MWidget('计算器'),
     );
   }
 }
@@ -81,7 +81,7 @@ class _MHome extends State<MWidget> {
     return resultWidget = new Container(
       child: Text(
         lastResult.toString(),
-        style: TextStyle(decoration: TextDecoration.none),
+        style: TextStyle(decoration: TextDecoration.none,fontSize: 30),
       ),
       color: Color.fromARGB(255, 255, 255, 255),
       width: MediaQuery.of(context).size.width,
@@ -94,7 +94,7 @@ class _MHome extends State<MWidget> {
     return new Container(
       child: Text(
         calculatorString,
-        style: TextStyle(decoration: TextDecoration.none),
+        style: TextStyle(decoration: TextDecoration.none,color: Color(0xff000000),fontSize: 20),
       ),
       color: Color.fromARGB(255, 255, 255, 255),
       width: MediaQuery.of(context).size.width,
@@ -133,11 +133,14 @@ class _MHome extends State<MWidget> {
         lastSymbol = '';
         calculatorString = '';
         lastResult = 0;
-      } else if (data == 'CE') {
+      } else if (data == 'CLEAR') {
         calculatorString = '';
         lastSymbol = '';
         lastResult = 0;
         isReset = true;
+      }else if(data=='CE'){
+        calculatorString=calculatorString.substring(0,calculatorString.length-1);
+
       } else if (data == '=') {
         try {
           num.parse(lastSymbol);
@@ -214,15 +217,25 @@ class _MHome extends State<MWidget> {
 class NumberText extends GestureDetector {
   NumberText(String data, Function f)
       : super(
-            child: Text(
-              data,
-              textAlign: TextAlign.left,
-              style: TextStyle(
-                decoration: TextDecoration.none,
-                color: Color(0xff007766),
+            child: Center(
+              child: Text(
+                data,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  decoration: TextDecoration.none,
+                  color: Color(0xff007766),
+                  fontStyle: FontStyle.italic,
+                ),
               ),
+
             ),
-            onTap: () => {f(data)});
+            onTap: () => {f(data)},
+            onLongPress:()=>{
+              if(data=='CE'){
+                f('CLEAR')
+              }
+            }
+            );
 }
 
 class RowText extends Row {
@@ -231,7 +244,7 @@ class RowText extends Row {
   RowText(List<String> numbers, Function f)
       : super(
           children: getWegit(numbers, f),
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           mainAxisSize: MainAxisSize.max,
         );
 
