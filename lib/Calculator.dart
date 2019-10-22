@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'dart:math';
 
 class CalculatorApp extends StatelessWidget {
   @override
@@ -67,12 +66,12 @@ class _MHome extends State<MWidget> {
     return titleWidget = Container(
       height: 20,
       alignment: Alignment.center,
-      margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
+      margin: EdgeInsets.fromLTRB(0, 23, 0, 0),
       padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
       color: Color.fromARGB(255, 255, 127, 127),
       child: Text(
         title,
-        style: TextStyle(fontSize: 20, decoration: TextDecoration.none),
+        style: TextStyle(fontSize: 10, decoration: TextDecoration.none),
       ),
     );
   }
@@ -81,7 +80,7 @@ class _MHome extends State<MWidget> {
     return resultWidget = new Container(
       child: Text(
         lastResult.toString(),
-        style: TextStyle(decoration: TextDecoration.none,fontSize: 30),
+        style: TextStyle(decoration: TextDecoration.none, fontSize: 30),
       ),
       color: Color.fromARGB(255, 255, 255, 255),
       width: MediaQuery.of(context).size.width,
@@ -94,7 +93,10 @@ class _MHome extends State<MWidget> {
     return new Container(
       child: Text(
         calculatorString,
-        style: TextStyle(decoration: TextDecoration.none,color: Color(0xff000000),fontSize: 20),
+        style: TextStyle(
+            decoration: TextDecoration.none,
+            color: Color(0xff000000),
+            fontSize: 20),
       ),
       color: Color.fromARGB(255, 255, 255, 255),
       width: MediaQuery.of(context).size.width,
@@ -106,7 +108,7 @@ class _MHome extends State<MWidget> {
   keyboardMethod(context) {
     return Container(
       margin: EdgeInsets.fromLTRB(0, 1, 0, 1),
-      height: MediaQuery.of(context).size.height - 100 - 100 - 20 - 20 - 2,
+      height: MediaQuery.of(context).size.height - 100 - 100 - 23 - 20 - 2,
       color: Color(0xffffffff),
       child: Column(
         children: <Widget>[
@@ -131,16 +133,22 @@ class _MHome extends State<MWidget> {
           isReset = true;
         }
         lastSymbol = '';
-        calculatorString = '';
         lastResult = 0;
       } else if (data == 'CLEAR') {
         calculatorString = '';
         lastSymbol = '';
         lastResult = 0;
         isReset = true;
-      }else if(data=='CE'){
-        calculatorString=calculatorString.substring(0,calculatorString.length-1);
-
+      } else if (data == 'CE') {
+        if(calculatorString.length==1){
+          calculatorString='';
+          lastSymbol='';
+        }else {
+          calculatorString =
+              calculatorString.substring(0, calculatorString.length - 1);
+          lastSymbol = calculatorString.substring(calculatorString.length-1,calculatorString.length);
+        }
+        print('zlmsg lastSymbol $lastSymbol');
       } else if (data == '=') {
         try {
           num.parse(lastSymbol);
@@ -154,39 +162,42 @@ class _MHome extends State<MWidget> {
         List<String> symbols = List();
         int numberCount = 0;
         for (int i = 0; i < calculatorString.length; i++) {
-          String s = calculatorString.substring(i, i+1);
+          String s = calculatorString.substring(i, i + 1);
           if (s == '+' || s == '-' || s == '*' || s == '/') {
             symbols.add(s);
             ++numberCount;
           } else {
-            if(numbers.length-1<numberCount) {
+            if (numbers.length - 1 < numberCount) {
               numbers.add(s);
-            }else{
+            } else {
               numbers[numberCount] = numbers[numberCount] + s;
             }
           }
         }
+        print('zlmsg numbers=$numbers');
 
-        for(int i =0; i<symbols.length;i++){
-          if(symbols[i]=='*'){
-            numbers[i]= (num.parse(numbers[i])*num.parse(numbers[i+1])).toString();
-            numbers.removeAt(i+1);
+        for (int i = 0; i < symbols.length; i++) {
+          if (symbols[i] == '*') {
+            numbers[i] =
+                (num.parse(numbers[i]) * num.parse(numbers[i + 1])).toString();
+            numbers.removeAt(i + 1);
             symbols.removeAt(i);
             --i;
-          }else if(symbols[i]=='/'){
-            numbers[i]= (num.parse(numbers[i])/num.parse(numbers[i+1])).toString();
-            numbers.removeAt(i+1);
+          } else if (symbols[i] == '/') {
+            numbers[i] =
+                (num.parse(numbers[i]) / num.parse(numbers[i + 1])).toString();
+            numbers.removeAt(i + 1);
             symbols.removeAt(i);
             --i;
           }
         }
 
-        lastResult=num.parse(numbers[0]);
-        for(int i=0;i<symbols.length;i++){
-          if(symbols[i]=='+'){
-            lastResult+=num.parse(numbers[i+1]);
-          }else{
-            lastResult-=num.parse(numbers[i+1]);
+        lastResult = num.parse(numbers[0]);
+        for (int i = 0; i < symbols.length; i++) {
+          if (symbols[i] == '+') {
+            lastResult += num.parse(numbers[i + 1]);
+          } else {
+            lastResult -= num.parse(numbers[i + 1]);
           }
         }
       } else if (data == '+' || data == '-' || data == '*' || data == '/') {
@@ -217,7 +228,7 @@ class _MHome extends State<MWidget> {
 class NumberText extends GestureDetector {
   NumberText(String data, Function f)
       : super(
-            child: Center(
+            child: Container(
               child: Text(
                 data,
                 textAlign: TextAlign.center,
@@ -227,15 +238,14 @@ class NumberText extends GestureDetector {
                   fontStyle: FontStyle.italic,
                 ),
               ),
-
+              color: Color(0xff001122),
+              width: 100,
             ),
             onTap: () => {f(data)},
-            onLongPress:()=>{
-              if(data=='CE'){
-                f('CLEAR')
-              }
-            }
-            );
+            onLongPress: () => {
+                  if (data == 'CE') {f('CLEAR')}
+                },
+  );
 }
 
 class RowText extends Row {
