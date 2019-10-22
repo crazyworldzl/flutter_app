@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'dart:math';
 
 class CalculatorApp extends StatelessWidget {
   @override
@@ -38,10 +39,9 @@ class MWidget extends StatefulWidget {
 
 class _MHome extends State<MWidget> {
   String title;
-  static List<String> dd;
-  static String lastSymbol = '';
-  static int lastResult = 0;
-  String resultString = '';
+  List<String> dd;
+  String lastSymbol = '';
+  num lastResult = 0;
   String calculatorString = '';
   bool isReset = false;
   Container resultWidget;
@@ -80,7 +80,7 @@ class _MHome extends State<MWidget> {
   resultMethod(context) {
     return resultWidget = new Container(
       child: Text(
-        resultString,
+        lastResult.toString(),
         style: TextStyle(decoration: TextDecoration.none),
       ),
       color: Color.fromARGB(255, 255, 255, 255),
@@ -92,19 +92,21 @@ class _MHome extends State<MWidget> {
 
   calculatorMethod() {
     return new Container(
-      child: Text(calculatorString,style: TextStyle(decoration: TextDecoration.none),),
+      child: Text(
+        calculatorString,
+        style: TextStyle(decoration: TextDecoration.none),
+      ),
       color: Color.fromARGB(255, 255, 255, 255),
       width: MediaQuery.of(context).size.width,
       alignment: Alignment.bottomRight,
       height: 100,
-
     );
   }
 
   keyboardMethod(context) {
     return Container(
       margin: EdgeInsets.fromLTRB(0, 1, 0, 1),
-      height: MediaQuery.of(context).size.height - 100 - 100-20- 20 - 2,
+      height: MediaQuery.of(context).size.height - 100 - 100 - 20 - 20 - 2,
       color: Color(0xffffffff),
       child: Column(
         children: <Widget>[
@@ -120,53 +122,90 @@ class _MHome extends State<MWidget> {
 
   _changeKey(String data) {
     setState(() {
-      print("zlmsg "+lastSymbol);
       if (isReset) {
         try {
           num.parse(data);
-          resultString = '';
-          calculatorString=data;
+          calculatorString = data;
           isReset = false;
         } on Exception {
-          resultString = '';
           isReset = true;
         }
         lastSymbol = '';
-        calculatorString='';
+        calculatorString = '';
         lastResult = 0;
-
       } else if (data == 'CE') {
-        resultString = '';
-        calculatorString='';
+        calculatorString = '';
         lastSymbol = '';
         lastResult = 0;
         isReset = true;
       } else if (data == '=') {
-        
+        try {
+          num.parse(lastSymbol);
+        } on Exception {
+          calculatorString =
+              calculatorString.substring(0, calculatorString.length - 1);
+          lastSymbol = calculatorString.substring(calculatorString.length - 1);
+        }
 
+        List<String> numbers = List();
+        List<String> symbols = List();
+        int numberCount = 0;
+        for (int i = 0; i < calculatorString.length; i++) {
+          String s = calculatorString.substring(i, i+1);
+          if (s == '+' || s == '-' || s == '*' || s == '/') {
+            symbols.add(s);
+            ++numberCount;
+          } else {
+            if(numbers.length-1<numberCount) {
+              numbers.add(s);
+            }else{
+              numbers[numberCount] = numbers[numberCount] + s;
+            }
+          }
+        }
+
+        for(int i =0; i<symbols.length;i++){
+          if(symbols[i]=='*'){
+            numbers[i]= (num.parse(numbers[i])*num.parse(numbers[i+1])).toString();
+            numbers.removeAt(i+1);
+            symbols.removeAt(i);
+            --i;
+          }else if(symbols[i]=='/'){
+            numbers[i]= (num.parse(numbers[i])/num.parse(numbers[i+1])).toString();
+            numbers.removeAt(i+1);
+            symbols.removeAt(i);
+            --i;
+          }
+        }
+
+        lastResult=num.parse(numbers[0]);
+        for(int i=0;i<symbols.length;i++){
+          if(symbols[i]=='+'){
+            lastResult+=num.parse(numbers[i+1]);
+          }else{
+            lastResult-=num.parse(numbers[i+1]);
+          }
+        }
       } else if (data == '+' || data == '-' || data == '*' || data == '/') {
-        if(lastSymbol!=data) {
-          if(lastSymbol==".")return;
+        if (lastSymbol != data) {
+          if (lastSymbol == ".") return;
           try {
             num.parse(lastSymbol);
             calculatorString = calculatorString + data;
           } on Exception {
-           calculatorString =  calculatorString.replaceRange(
+            calculatorString = calculatorString.replaceRange(
                 calculatorString.length - 1, calculatorString.length, data);
           }
-          print('zlmsg=3');
           lastSymbol = data;
-
         }
-        
-      } else if(data=='.'){
-        if(lastSymbol!='.'){
-          lastSymbol=data;
-          calculatorString = calculatorString+data;
+      } else if (data == '.') {
+        if (lastSymbol != '.') {
+          lastSymbol = data;
+          calculatorString = calculatorString + data;
         }
-      }else {
-        lastSymbol=data;
-        calculatorString = calculatorString+data;
+      } else {
+        lastSymbol = data;
+        calculatorString = calculatorString + data;
       }
     });
   }
