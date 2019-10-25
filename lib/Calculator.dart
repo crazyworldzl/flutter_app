@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 import 'Home.dart';
-import 'main.dart';
 
 class CalculatorApp extends StatelessWidget {
   @override
@@ -71,10 +70,8 @@ class _MHome extends State<MWidget> {
 
 
           Navigator.push(context, MaterialPageRoute(builder: (_) {
-          return Home();
+          return home;
           }))
-
-
 
 
 
